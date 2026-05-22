@@ -6,10 +6,16 @@ const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+
+    const { searchParams } = new URL(request.url);
+
+    const username =
+      searchParams.get("username") || "ayu_buildss";
+
     const response = await fetch(
-      "http://localhost:3000/api/profile"
+      `http://localhost:3000/api/profile?username=${username}`
     );
 
     const profile = await response.json();
@@ -21,13 +27,19 @@ Analyze this developer profile:
 
 Name: ${profile.name}
 Bio: ${profile.bio}
-README: ${profile.readme}
+README: ${profile.readmeHtml}
 
-Return:
-1. Archetype title
-2. Personality summary
-3. Key strengths
-4. Future prediction
+Return ONLY valid JSON.
+
+Format:
+{
+  "archetype": "",
+  "summary": "",
+  "strengths": ["", "", ""],
+  "futurePrediction": "",
+  "auraScore": 0,
+  "vibe": ""
+}
 `;
 
     const completion =
@@ -41,12 +53,23 @@ Return:
         ],
       });
 
+    const raw =
+      completion.choices[0].message.content || "";
+
+    const cleaned = raw
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    const auraData = JSON.parse(cleaned);
+
     return NextResponse.json({
       profile,
-      aura:
-        completion.choices[0].message.content,
+      aura: auraData,
     });
+
   } catch (error) {
+
     console.error(error);
 
     return NextResponse.json(

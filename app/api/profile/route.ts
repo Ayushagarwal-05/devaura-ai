@@ -1,19 +1,40 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const username =
+      req.nextUrl.searchParams.get("username");
+
+    if (!username) {
+      return NextResponse.json(
+        { error: "Username required" },
+        { status: 400 }
+      );
+    }
+
     const response = await fetch(
-      "https://api.daily.dev/public/v1/profile",
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.DAILY_DEV_API_KEY}`,
-        },
-      }
+      `https://app.daily.dev/${username}`
     );
 
-    const data = await response.json();
+    const html = await response.text();
 
-    return NextResponse.json(data);
+    const match = html.match(
+      /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/
+    );
+
+    if (!match) {
+      return NextResponse.json(
+        { error: "Profile not found" },
+        { status: 404 }
+      );
+    }
+
+    const json = JSON.parse(match[1]);
+
+    const profile =
+      json.props.pageProps.user;
+
+    return NextResponse.json(profile);
   } catch (error) {
     console.error(error);
 

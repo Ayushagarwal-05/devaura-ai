@@ -887,29 +887,54 @@ function Navbar() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "border-b border-white/[0.06] bg-[#05050a]/80 backdrop-blur-xl" : ""}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "border-b border-white/[0.06] bg-[#05050a]/80 backdrop-blur-xl"
+          : ""
+      }`}
     >
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+
+        {/* LOGO */}
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="text-white font-bold">DevAura AI</span>
+
+          <span className="text-white font-bold">
+            DevAura AI
+          </span>
         </div>
+
+        {/* NAV LINKS */}
         <div className="hidden md:flex items-center gap-8 text-sm text-white/40">
-          {["How It Works", "Metrics", "Archetypes", "Showcase"].map((l) => (
-            <a key={l} href="#" className="hover:text-white/80 transition-colors">
+          {[
+            "How It Works",
+            "Metrics",
+            "Archetypes",
+            "Showcase",
+          ].map((l) => (
+            <a
+              key={l}
+              href="#"
+              className="hover:text-white/80 transition-colors"
+            >
               {l}
             </a>
           ))}
         </div>
-        <motion.button
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.97 }}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-semibold"
-        >
-          Get My Aura
-        </motion.button>
+
+        {/* BUTTON */}
+        <a href="/results?username=ayu_buildss">
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-semibold"
+          >
+            Get My Aura
+          </motion.button>
+        </a>
+
       </div>
     </motion.nav>
   );
