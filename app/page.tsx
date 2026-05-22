@@ -456,7 +456,7 @@ function HeroSection() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-sm font-medium mb-8"
         >
           <Sparkles className="w-4 h-4" />
-          Powered by daily.dev · Built at Hackathon 2024
+          Powered by daily.dev · Built at Hackathon 2026
           <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
         </motion.div>
 
@@ -583,8 +583,7 @@ function HowItWorksSection() {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6 relative">
-          {/* Connector line */}
-          <div className="absolute top-12 left-1/4 right-1/4 h-px bg-gradient-to-r from-violet-500/30 via-cyan-500/30 to-orange-500/30 hidden md:block" />
+          
 
           {STEPS.map((step, i) => (
             <motion.div
@@ -855,7 +854,7 @@ function Footer() {
             <Sparkles className="w-3 h-3 text-white" />
           </div>
           <span className="text-white/70 font-bold text-sm">DevAura AI</span>
-          <span className="text-white/20 text-xs">· Hackathon 2024</span>
+          <span className="text-white/20 text-xs">· Hackathon 2026</span>
         </div>
         <div className="flex items-center gap-6 text-xs text-white/25">
           {["Privacy", "Terms", "GitHub", "daily.dev"].map((l) => (
