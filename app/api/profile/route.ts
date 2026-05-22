@@ -2,26 +2,14 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const response = await fetch("https://api.daily.dev/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.DAILY_DEV_API_KEY}`,
-      },
-      body: JSON.stringify({
-        query: `
-          query {
-            __schema {
-              queryType {
-                fields {
-                  name
-                }
-              }
-            }
-          }
-        `,
-      }),
-    });
+    const response = await fetch(
+      "https://api.daily.dev/public/v1/profile",
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.DAILY_DEV_API_KEY}`,
+        },
+      }
+    );
 
     const data = await response.json();
 
