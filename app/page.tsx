@@ -590,7 +590,7 @@ function HeroSection() {
 
 function HowItWorksSection() {
   return (
-    <section className="relative py-28 px-4 overflow-hidden">
+    <section id="how-it-works" className="relative py-28 px-4 overflow-hidden">
       <GlowOrb className="w-[600px] h-[600px] bg-violet-700 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
       <div className="max-w-6xl mx-auto">
         <motion.div
@@ -642,7 +642,7 @@ function HowItWorksSection() {
 
 function MetricsSection() {
   return (
-    <section className="relative py-28 px-4 overflow-hidden">
+    <section id="metrics" className="relative py-28 px-4 overflow-hidden">
       <GlowOrb className="w-[500px] h-[500px] bg-cyan-700 -bottom-20 -right-20 opacity-15" />
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -690,7 +690,7 @@ function MetricsSection() {
 
 function ArchetypesSection() {
   return (
-    <section className="relative py-28 px-4 overflow-hidden">
+    <section id="archetypes" className="relative py-28 px-4 overflow-hidden">
       <GlowOrb className="w-[700px] h-[700px] bg-orange-700 -top-40 -left-40 opacity-10" />
       <div className="max-w-6xl mx-auto">
         <motion.div
@@ -726,7 +726,7 @@ function ArchetypesSection() {
 
 function ShowcaseSection() {
   return (
-    <section className="relative py-28 px-4 overflow-hidden">
+    <section id="showcase" className="relative py-28 px-4 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-950/20 to-transparent pointer-events-none" />
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -954,17 +954,17 @@ function Navbar() {
         {/* NAV LINKS */}
         <div className="hidden md:flex items-center gap-8 text-sm text-white/40">
           {[
-            "How It Works",
-            "Metrics",
-            "Archetypes",
-            "Showcase",
-          ].map((l) => (
+            { label: "How It Works", href: "#how-it-works" },
+            { label: "Metrics", href: "#metrics" },
+            { label: "Archetypes", href: "#archetypes" },
+            { label: "Showcase", href: "#showcase" },
+          ].map((item) => (
             <a
-              key={l}
-              href="#"
+              key={item.label}
+              href={item.href}
               className="relative group hover:text-white/90 transition-colors duration-200 py-1"
             >
-              {l}
+              {item.label}
 
               <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-violet-400 to-cyan-400 group-hover:w-full transition-all duration-300" />
             </a>
