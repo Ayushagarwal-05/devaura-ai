@@ -25,6 +25,10 @@ export default function AnalyzePage() {
           `/api/aura?username=${encodedUsername}`
         );
 
+        if (!res.ok) {
+          throw new Error("Failed to load aura");
+        }
+
         const json = await res.json();
 
         if (cancelled) return;

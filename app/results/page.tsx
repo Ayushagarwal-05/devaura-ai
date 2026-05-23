@@ -45,30 +45,38 @@ export default function ResultsPage() {
     if (data) return;
 
     async function loadAura() {
-      const params = new URLSearchParams(
-        window.location.search
-      );
+      try {
+        const params = new URLSearchParams(
+          window.location.search
+        );
 
-      const username =
-        params.get("username") || "ayu_buildss";
-      const encodedUsername =
-        encodeURIComponent(username);
+        const username =
+          params.get("username") || "ayu_buildss";
+        const encodedUsername =
+          encodeURIComponent(username);
 
-      const res = await fetch(
-        `/api/aura?username=${encodedUsername}`
-      );
+        const res = await fetch(
+          `/api/aura?username=${encodedUsername}`
+        );
 
-      const json = await res.json();
+        if (!res.ok) {
+          throw new Error("Failed to load aura");
+        }
 
-      sessionStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          username,
-          data: json,
-        })
-      );
+        const json = await res.json();
 
-      setData(json);
+        sessionStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            username,
+            data: json,
+          })
+        );
+
+        setData(json);
+      } catch {
+        return;
+      }
     }
 
     loadAura();
