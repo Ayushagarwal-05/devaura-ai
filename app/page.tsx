@@ -894,14 +894,26 @@ function Footer() {
           <span className="text-white/20 text-xs">· Hackathon 2026</span>
         </div>
         <div className="flex items-center gap-6 text-xs text-white/25">
-          {["Privacy", "Terms", "GitHub", "daily.dev"].map((l) => (
-            <a key={l} href="#" className="hover:text-white/60 transition-colors">
-              {l}
-            </a>
-          ))}
-        </div>
+          <a
+            href="https://github.com/Ayushagarwal-05"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white/60 transition-colors"
+          >
+            GitHub
+          </a>
+
+          <a
+            href="https://daily.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white/60 transition-colors"
+          >
+          daily.dev
+        </a>
+      </div>
         <p className="text-xs text-white/20">
-          Built with daily.dev API · Powered by Claude
+          Built with daily.dev API
         </p>
       </div>
     </footer>
