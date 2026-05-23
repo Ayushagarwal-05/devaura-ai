@@ -468,7 +468,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-[-0.03em] leading-[0.98] mb-6"
+          className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-[-0.02em] leading-[0.95] mb-6"
         >
           <span className="text-white drop-shadow-[0_0_40px_rgba(139,92,246,0.25)]">Your Developer</span>
           <br />
@@ -972,7 +972,7 @@ function Navbar() {
         </div>
 
         {/* BUTTON */}
-        <a href="/results?username=ayu_buildss">
+        <a href="/analyze">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.96 }}

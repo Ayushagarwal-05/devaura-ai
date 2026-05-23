@@ -4,46 +4,60 @@ import { domToPng } from "modern-screenshot";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+const AURA_CACHE_PREFIX = "devaura:aura:";
+
+function getUsernameFromSearch() {
+  if (typeof window === "undefined") return "ayu_buildss";
+  const params = new URLSearchParams(window.location.search);
+  return params.get("username") || "ayu_buildss";
+}
+
 export default function ResultsPage() {
-  const [data, setData] = useState<any>(null);
+  const [username] = useState(getUsernameFromSearch);
+  const [data, setData] = useState<any>(() => {
+    if (typeof window === "undefined") return null;
+    const cacheKey = `${AURA_CACHE_PREFIX}${getUsernameFromSearch()}`;
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
+    if (data) return;
+    let active = true;
+    const controller = new AbortController();
+
     async function loadAura() {
-      const params = new URLSearchParams(
-        window.location.search
-      );
-
-      const username =
-        params.get("username") || "ayu_buildss";
-
       const res = await fetch(
-        `/api/aura?username=${username}`
+        `/api/aura?username=${encodeURIComponent(username)}`,
+        { signal: controller.signal }
       );
-
+      if (!res.ok) return;
       const json = await res.json();
-
+      if (!active) return;
+      try {
+        sessionStorage.setItem(
+          `${AURA_CACHE_PREFIX}${username}`,
+          JSON.stringify(json)
+        );
+      } catch {
+        // Ignore sessionStorage quota errors.
+      }
       setData(json);
     }
 
     loadAura();
-  }, []);
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [data, username]);
 
   if (!data) {
-    return (
-      <main className="min-h-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
-        <div className="absolute w-[500px] h-[500px] bg-cyan-500/20 blur-3xl rounded-full animate-pulse" />
-
-        <div className="text-center z-10 space-y-6">
-          <h1 className="text-5xl font-bold animate-pulse">
-            Reading Your Aura...
-          </h1>
-
-          <div className="w-64 h-3 bg-zinc-800 rounded-full overflow-hidden">
-            <div className="h-full w-2/3 bg-gradient-to-r from-cyan-400 to-purple-500 animate-pulse" />
-          </div>
-        </div>
-      </main>
-    );
+    return <main className="min-h-screen bg-black" />;
   }
 
   const profile = data.profile;
