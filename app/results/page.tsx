@@ -8,7 +8,29 @@ import {
   DEFAULT_USERNAME,
 } from "@/lib/aura";
 
-const getInitialData = () => {
+type AuraProfile = {
+  name: string;
+  username: string;
+  image: string;
+  reputation: number;
+  bio: string;
+};
+
+type AuraData = {
+  archetype: string;
+  summary: string;
+  strengths: string[];
+  futurePrediction: string;
+  auraScore: number;
+  vibe: string;
+};
+
+type AuraResponse = {
+  profile: AuraProfile;
+  aura: AuraData;
+};
+
+const getCachedAuraData = (): AuraResponse | null => {
   if (typeof window === "undefined") {
     return null;
   }
@@ -29,7 +51,7 @@ const getInitialData = () => {
       parsed?.username === username &&
       parsed?.data
     ) {
-      return parsed.data;
+      return parsed.data as AuraResponse;
     }
   } catch (error) {
     console.warn(
@@ -43,9 +65,12 @@ const getInitialData = () => {
 };
 
 export default function ResultsPage() {
-  const cachedData = useMemo(() => getInitialData(), []);
-  const [data, setData] = useState<any>(() =>
-    cachedData
+  const cachedData = useMemo<AuraResponse | null>(
+    () => getCachedAuraData(),
+    []
+  );
+  const [data, setData] = useState<AuraResponse | null>(
+    () => cachedData
   );
 
   useEffect(() => {
@@ -70,7 +95,7 @@ export default function ResultsPage() {
           throw new Error("Failed to load aura");
         }
 
-        const json = await res.json();
+        const json: AuraResponse = await res.json();
 
         sessionStorage.setItem(
           AURA_STORAGE_KEY,

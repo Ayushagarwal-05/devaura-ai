@@ -13,7 +13,7 @@ export default function AnalyzePage() {
   useEffect(() => {
     let cancelled = false;
 
-    const loadAura = async () => {
+    const prefetchAuraData = async () => {
       const params = new URLSearchParams(
         window.location.search
       );
@@ -60,7 +60,7 @@ export default function AnalyzePage() {
       }
     };
 
-    loadAura();
+    prefetchAuraData();
 
     return () => {
       cancelled = true;
