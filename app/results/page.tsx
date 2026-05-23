@@ -496,8 +496,17 @@ export default function ResultsPage() {
 
   // ── SHARE HANDLER — UNCHANGED ────────────────────────────
   const handleShare = () => {
-    navigator.clipboard.writeText(`I got "${aura.archetype}" on DevAura AI 🔥`);
-    alert("Aura copied to clipboard!");
+    navigator.clipboard.writeText(
+      `My DevAura identity: ${aura.archetype} ⚡
+
+  ${aura.summary}
+
+  Aura Score: ${score}
+
+  Analyze yours → https://devaura-ai.vercel.app`
+    );
+
+    alert("DevAura identity copied.");
   };
 
   // ── DOWNLOAD HANDLER — REBUILT ────────────────────────────
