@@ -614,7 +614,7 @@ function HowItWorksSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative p-6 rounded-2xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 group"
+              className="relative p-6 rounded-2xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/20 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(139,92,246,0.08)] transition-all duration-300 group"
             >
               <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${step.color} mb-4 text-white`}>
                 {step.icon}
@@ -795,7 +795,7 @@ function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.12, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="p-6 rounded-2xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 group"
+              className="p-6 rounded-2xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.05] hover:border-violet-500/20 hover:shadow-[0_0_24px_rgba(139,92,246,0.07)] transition-all duration-300 group"
             >
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
