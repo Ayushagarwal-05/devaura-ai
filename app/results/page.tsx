@@ -1,10 +1,12 @@
 "use client";
 
 import { domToPng } from "modern-screenshot";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-
-const STORAGE_KEY = "devaura:aura";
+import {
+  AURA_STORAGE_KEY,
+  DEFAULT_USERNAME,
+} from "@/lib/aura";
 
 const getInitialData = () => {
   if (typeof window === "undefined") {
@@ -15,8 +17,8 @@ const getInitialData = () => {
     window.location.search
   );
   const username =
-    params.get("username") || "ayu_buildss";
-  const cached = sessionStorage.getItem(STORAGE_KEY);
+    params.get("username") || DEFAULT_USERNAME;
+  const cached = sessionStorage.getItem(AURA_STORAGE_KEY);
 
   if (!cached) return null;
 
@@ -41,12 +43,13 @@ const getInitialData = () => {
 };
 
 export default function ResultsPage() {
+  const cachedData = useMemo(() => getInitialData(), []);
   const [data, setData] = useState<any>(() =>
-    getInitialData()
+    cachedData
   );
 
   useEffect(() => {
-    if (data) return;
+    if (cachedData) return;
 
     async function loadAura() {
       try {
@@ -55,7 +58,7 @@ export default function ResultsPage() {
         );
 
         const username =
-          params.get("username") || "ayu_buildss";
+          params.get("username") || DEFAULT_USERNAME;
         const encodedUsername =
           encodeURIComponent(username);
 
@@ -70,7 +73,7 @@ export default function ResultsPage() {
         const json = await res.json();
 
         sessionStorage.setItem(
-          STORAGE_KEY,
+          AURA_STORAGE_KEY,
           JSON.stringify({
             username,
             data: json,
@@ -88,7 +91,7 @@ export default function ResultsPage() {
     }
 
     loadAura();
-  }, [data]);
+  }, [cachedData]);
 
   if (!data) {
     return (

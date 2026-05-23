@@ -2,8 +2,10 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-const STORAGE_KEY = "devaura:aura";
+import {
+  AURA_STORAGE_KEY,
+  DEFAULT_USERNAME,
+} from "@/lib/aura";
 
 export default function AnalyzePage() {
   const router = useRouter();
@@ -16,7 +18,7 @@ export default function AnalyzePage() {
         window.location.search
       );
       const username =
-        params.get("username") || "ayu_buildss";
+        params.get("username") || DEFAULT_USERNAME;
       const encodedUsername =
         encodeURIComponent(username);
 
@@ -34,7 +36,7 @@ export default function AnalyzePage() {
         if (cancelled) return;
 
         sessionStorage.setItem(
-          STORAGE_KEY,
+          AURA_STORAGE_KEY,
           JSON.stringify({
             username,
             data: json,
