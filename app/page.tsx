@@ -450,29 +450,34 @@ function HeroSection() {
       <motion.div style={{ opacity }} className="relative z-10 text-center max-w-5xl mx-auto">
         {/* Badge */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-sm font-medium mb-8"
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-sm font-medium mb-8 backdrop-blur-sm"
         >
           <Sparkles className="w-4 h-4" />
           Powered by daily.dev · Built at Hackathon 2026
-          <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-400" />
+          </span>
         </motion.div>
 
         {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6"
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-[-0.03em] leading-[0.88] mb-6"
         >
-          <span className="text-white">Your Developer</span>
+          <span className="text-white drop-shadow-[0_0_40px_rgba(139,92,246,0.25)]">Your Developer</span>
           <br />
           <span
             className="bg-clip-text text-transparent"
             style={{
               backgroundImage: "linear-gradient(135deg, #8b5cf6 0%, #06b6d4 50%, #f97316 100%)",
+              backgroundSize: "200% auto",
+              animation: "shimmer 6s linear infinite",
             }}
           >
             Aura Revealed
@@ -500,9 +505,16 @@ function HeroSection() {
           <motion.button
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold text-base overflow-hidden"
+            className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold text-base overflow-hidden shadow-[0_0_0_0_rgba(139,92,246,0)] hover:shadow-[0_0_0_4px_rgba(139,92,246,0.25)] transition-shadow duration-300"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-cyan-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+            {/* Shimmer sweep on hover */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.6 }}
+            />
             <span className="relative flex items-center gap-2">
               <Zap className="w-5 h-5" />
               Reveal My Aura
@@ -525,16 +537,26 @@ function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-16 flex items-center justify-center gap-8 sm:gap-16 text-center"
+          className="mt-16 flex items-center justify-center gap-0 text-center"
         >
           {[
             { val: "47K+", label: "Developers Analyzed" },
             { val: "200+", label: "Aura Signals" },
             { val: "12", label: "Archetypes" },
-          ].map((s) => (
-            <div key={s.label}>
-              <p className="text-2xl sm:text-3xl font-black text-white">{s.val}</p>
-              <p className="text-xs text-white/30 mt-1">{s.label}</p>
+          ].map((s, i) => (
+            <div key={s.label} className="flex items-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.55 + i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="px-8 sm:px-14"
+              >
+                <p className="text-2xl sm:text-3xl font-black text-white tabular-nums">{s.val}</p>
+                <p className="text-xs text-white/30 mt-1 font-mono tracking-widest uppercase">{s.label}</p>
+              </motion.div>
+              {i < 2 && (
+                <div className="h-8 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+              )}
             </div>
           ))}
         </motion.div>
@@ -545,7 +567,7 @@ function HeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
         <span className="text-xs text-white/20 font-mono tracking-widest uppercase">Scroll</span>
         <motion.div
