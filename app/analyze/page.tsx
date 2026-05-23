@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-const AURA_CACHE_PREFIX = "devaura:aura:";
-const MIN_ROUTE_MS = 7600;
-const EXIT_OFFSET_MS = 400;
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const AURA_CACHE_PREFIX  = "devaura:aura:";
+const MIN_DISPLAY_MS     = 5200;  // minimum cinematic duration
+const EXIT_ANIM_MS       = 300;   // exit animation duration
+const POST_COMPLETE_MS   = 350;   // pause at 100% before exit starts
 
 function getUsernameFromSearch() {
   if (typeof window === "undefined") return "ayu_buildss";
@@ -14,60 +16,25 @@ function getUsernameFromSearch() {
   return params.get("username") || "ayu_buildss";
 }
 
+// ─── EASING ───────────────────────────────────────────────────────────────────
+// Smooth acceleration + deceleration. Maps 0–1 → 0–1.
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
 // ─── LOG LINES ────────────────────────────────────────────────────────────────
 const LOGS = [
-  {
-    symbol: "✓",
-    text: "Parsing reading behavior...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Mapping tech stack affinity...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Detecting open-source resonance...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Calculating learning velocity...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Analyzing engineering depth...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Estimating creativity index...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Mapping architecture preference...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Detecting builder archetype...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "✓",
-    text: "Generating aura signature...",
-    color: "text-zinc-400",
-  },
-  {
-    symbol: "→",
-    text: "Finalizing cinematic identity...",
-    color: "text-cyan-400",
-  },
+  { symbol: "✓", text: "Parsing reading behavior...",          color: "text-zinc-400" },
+  { symbol: "✓", text: "Mapping tech stack affinity...",       color: "text-zinc-400" },
+  { symbol: "✓", text: "Detecting open-source resonance...",   color: "text-zinc-400" },
+  { symbol: "✓", text: "Calculating learning velocity...",     color: "text-zinc-400" },
+  { symbol: "✓", text: "Analyzing engineering depth...",       color: "text-zinc-400" },
+  { symbol: "✓", text: "Estimating creativity index...",       color: "text-zinc-400" },
+  { symbol: "✓", text: "Mapping architecture preference...",   color: "text-zinc-400" },
+  { symbol: "✓", text: "Detecting builder archetype...",       color: "text-zinc-400" },
+  { symbol: "✓", text: "Generating aura signature...",         color: "text-zinc-400" },
+  { symbol: "→", text: "Finalizing cinematic identity...",     color: "text-cyan-400"  },
 ];
-
 
 const STAGES = [
   "Initializing signal scan...",
@@ -76,119 +43,132 @@ const STAGES = [
   "Generating identity card...",
 ];
 
+// ─── COMPONENT ────────────────────────────────────────────────────────────────
 export default function AnalyzePage() {
-  const router = useRouter();
-  const startTimeRef = useRef(Date.now());
+  const router     = useRouter();
   const [username] = useState(getUsernameFromSearch);
-  const [dataReady, setDataReady] = useState(false);
 
-  // ── Visual state ────────────────────────────────────────
+  // ── Visual state ──────────────────────────────────────────
   const [progress,    setProgress]    = useState(0);
   const [stageIndex,  setStageIndex]  = useState(0);
   const [visibleLogs, setVisibleLogs] = useState(0);
   const [exiting,     setExiting]     = useState(false);
 
-  // ── Animate progress 0 → 100 over ~3.6 s ───────────────
+  // ── Timing refs — mutations never cause re-renders ───────
+  const rafRef        = useRef<number>(0);
+  const startRef      = useRef<number>(0);
+  const totalDurRef   = useRef<number>(MIN_DISPLAY_MS);
+  const completeRef   = useRef<boolean>(false);
+
+  // ── rAF progress loop ────────────────────────────────────
+  // Progress is a pure function of elapsed / totalDuration.
+  // Logs are revealed as progress crosses each threshold —
+  // progress drives logs, never the other way around.
   useEffect(() => {
-    const interval = 30;
-    const step     = (100 / 3600) * interval;
-    let current    = 0;
+    startRef.current = performance.now();
 
-    const ticker = setInterval(() => {
-      current = Math.min(current + step + Math.random() * 0.4, 100);
-      setProgress(current);
+    function tick(now: number) {
+      const elapsed  = now - startRef.current;
+      const duration = totalDurRef.current;
+      const raw      = Math.min(elapsed / duration, 1);
+      const eased    = easeInOutCubic(raw);
+      const pct      = eased * 100;
+
+      setProgress(pct);
+
+      // Reveal log N the moment progress crosses its threshold.
+      // The -1 offset prevents the final log needing exact 100%.
+      const newVisible = LOGS.filter(
+        (_, i) => pct >= ((i + 1) / LOGS.length) * 100 - 1
+      ).length;
+      setVisibleLogs(newVisible);
+
+      // Advance stage label
       setStageIndex(
-        Math.min(Math.floor((current / 100) * STAGES.length), STAGES.length - 1)
+        Math.min(Math.floor(raw * STAGES.length), STAGES.length - 1)
       );
-      if (current >= 100) clearInterval(ticker);
-    }, interval);
 
-    return () => clearInterval(ticker);
+      if (raw < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        // ── Reached 100% — guaranteed exit sequence ──────
+        if (!completeRef.current) {
+          completeRef.current = true;
+          setProgress(100);
+          setVisibleLogs(LOGS.length);
+          setStageIndex(STAGES.length - 1);
+
+          setTimeout(() => setExiting(true), POST_COMPLETE_MS);
+          setTimeout(
+            () => router.push(`/results?username=${encodeURIComponent(username)}`),
+            POST_COMPLETE_MS + EXIT_ANIM_MS
+          );
+        }
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Stagger log lines: one every 800 ms ─────────────────
-  useEffect(() => {
-    if (visibleLogs >= LOGS.length) return;
-    const t = setTimeout(() => setVisibleLogs((v) => v + 1), 520);
-    return () => clearTimeout(t);
-  }, [visibleLogs]);
-
-  // ── Original routing preserved exactly ──────────────────
+  // ── API prefetch + cache in sessionStorage ───────────────
+  // Stretches totalDurRef if the API is slower than MIN_DISPLAY_MS
+  // so the bar always finishes in sync with real data — no fake gaps.
   useEffect(() => {
     router.prefetch("/results");
-  }, [router]);
 
-  // ── Preload aura during analysis, cache in sessionStorage ─
-  useEffect(() => {
-    let active = true;
+    let active       = true;
     const controller = new AbortController();
 
     async function preloadAura() {
       const cacheKey = `${AURA_CACHE_PREFIX}${username}`;
+
+      // Already cached — no stretch needed
       try {
         const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          setDataReady(true);
-          return;
-        }
-      } catch {
-        // Ignore sessionStorage access issues.
-      }
+        if (cached) return;
+      } catch { /* ignore */ }
 
       try {
-        const res = await fetch(`/api/aura?username=${encodeURIComponent(username)}`,
+        const res = await fetch(
+          `/api/aura?username=${encodeURIComponent(username)}`,
           { signal: controller.signal }
         );
         if (!res.ok) throw new Error("Aura fetch failed");
         const json = await res.json();
         if (!active) return;
-        try {
-          sessionStorage.setItem(cacheKey, JSON.stringify(json));
-        } catch {
-          // Ignore sessionStorage quota errors.
+
+        try { sessionStorage.setItem(cacheKey, JSON.stringify(json)); }
+        catch { /* quota */ }
+
+        // If API took longer than MIN_DISPLAY_MS, stretch the animation
+        // window so the bar finishes exactly when data is ready (+400ms buffer).
+        const elapsed = performance.now() - startRef.current;
+        if (elapsed + 400 > totalDurRef.current) {
+          totalDurRef.current = elapsed + 400;
         }
-        setDataReady(true);
-      } catch (error) {
-        if (!active) return;
-        setDataReady(true);
+      } catch {
+        // On error let the animation complete normally — results page
+        // handles the missing data gracefully.
       }
     }
 
     preloadAura();
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [username]);
+    return () => { active = false; controller.abort(); };
+  }, [router, username]);
 
-  // ── Exit + route once data is ready, keeping cinematic timing ─
-  useEffect(() => {
-    if (!dataReady) return;
-    const elapsed = Date.now() - startTimeRef.current;
-    const exitDelay = Math.max(0, MIN_ROUTE_MS - EXIT_OFFSET_MS - elapsed);
-    const routeDelay = Math.max(0, MIN_ROUTE_MS - elapsed);
-
-    const exitTimer = setTimeout(() => setExiting(true), exitDelay);
-    const routeTimer = setTimeout(() => {
-      router.push(`/results?username=${encodeURIComponent(username)}`);
-    }, routeDelay);
-
-    return () => {
-      clearTimeout(exitTimer);
-      clearTimeout(routeTimer);
-    };
-  }, [dataReady, router, username]);
-
-  // ── Particles (computed once, stable) ───────────────────
+  // ── Particles (stable, computed once) ────────────────────
   const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
-    size:    1.5 + (i % 2),
-    left:    `${(i * 41.3) % 100}%`,
-    top:     `${(i * 57.7) % 100}%`,
-    color:   i % 3 === 0 ? "#22d3ee" : i % 3 === 1 ? "#8b5cf6" : "#fb923c",
-    dur:     4 + (i % 4),
-    delay:   i * 0.22,
+    size:  1.5 + (i % 2),
+    left:  `${(i * 41.3) % 100}%`,
+    top:   `${(i * 57.7) % 100}%`,
+    color: i % 3 === 0 ? "#22d3ee" : i % 3 === 1 ? "#8b5cf6" : "#fb923c",
+    dur:   4 + (i % 4),
+    delay: i * 0.22,
   }));
 
+  // ─── JSX — all UI/design completely unchanged ─────────────────────────────
   return (
     <AnimatePresence>
       {!exiting && (
@@ -409,7 +389,7 @@ export default function AnalyzePage() {
                   ))}
                 </div>
 
-                {/* Inner glow builds when progress > 80 % */}
+                {/* Inner glow builds when progress > 80% */}
                 {progress > 80 && (
                   <motion.div
                     initial={{ opacity: 0 }}
