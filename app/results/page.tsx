@@ -29,7 +29,7 @@ const getInitialData = () => {
     ) {
       return parsed.data;
     }
-  } catch (error) {
+  } catch {
     return null;
   }
 

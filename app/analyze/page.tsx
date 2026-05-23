@@ -40,7 +40,7 @@ export default function AnalyzePage() {
         router.push(
           `/results?username=${encodedUsername}`
         );
-      } catch (error) {
+      } catch {
         if (cancelled) return;
 
         router.push(
