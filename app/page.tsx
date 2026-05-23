@@ -669,13 +669,15 @@ function MetricsSection() {
               Every developer radiates a unique signal. Our AI maps it across six dimensions
               that capture not just what you know — but how you think and where you're headed.
             </p>
-            <motion.button
+            <motion.a
+              href="#showcase"
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-cyan-500/30 text-cyan-400 text-sm font-semibold hover:bg-cyan-500/10 transition-all duration-300"
             >
-              See Full Breakdown <ChevronRight className="w-4 h-4" />
-            </motion.button>
+              See Full Breakdown 
+              <ChevronRight className="w-4 h-4" />
+            </motion.a>
           </motion.div>
 
           {/* Right: metric bars */}
@@ -857,8 +859,9 @@ function FinalCTASection() {
           Every article you read, every tag you follow, every bookmark you save — it's all shaping
           your developer aura. Let DevAura AI reveal what it already knows about you.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <motion.button
+        <div className="flex flex-col items-center justify-center gap-3">
+          <motion.a
+            href="/analyze"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             className="group relative px-10 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-bold text-base overflow-hidden"
@@ -869,8 +872,10 @@ function FinalCTASection() {
               Start Your Analysis
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
-          </motion.button>
-          <p className="text-white/20 text-sm">No credit card · 2 minutes</p>
+          </motion.a>
+          <p className="text-white/20 text-sm">
+            AI-generated developer identity powered by daily.dev
+          </p>
         </div>
       </motion.div>
     </section>
