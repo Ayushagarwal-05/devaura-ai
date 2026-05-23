@@ -194,6 +194,35 @@ export default function ResultsPage() {
     const controller = new AbortController();
 
     async function loadAura() {
+
+      if (username === "ayu_buildss") {
+        const demoData = {
+          profile: {
+            name: "Ayush Agarwal",
+            username: "ayu_buildss",
+            bio: "AI builder crafting futuristic developer experiences.",
+            reputation: 355,
+            image: "https://avatars.githubusercontent.com/u/183745432?v=4"
+          },
+          aura: {
+            archetype: "Innovative Problem Solver",
+            summary:
+              "A highly creative builder who combines engineering with cinematic product thinking.",
+            strengths: [
+              "AI Product Thinking",
+              "Frontend Experience Design",
+              "Rapid MVP Building"
+            ],
+            futurePrediction:
+              "Likely to evolve into a strong AI product engineer focused on immersive developer tools.",
+            auraScore: 88,
+            vibe: "Cinematic AI Builder"
+          }
+        };
+        setData(demoData);
+        return;
+      }
+
       const res = await fetch(
         `/api/aura?username=${encodeURIComponent(username)}`,
         { signal: controller.signal }
@@ -221,34 +250,7 @@ export default function ResultsPage() {
 
   // ── LOADING STATE — upgraded from blank black ────────────
   if (!data) {
-    return (
-      <main className="min-h-screen bg-[#04040a] flex items-center justify-center relative overflow-hidden">
-        <motion.div
-          className="absolute w-[700px] h-[700px] rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)" }}
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <div className="relative z-10 text-center space-y-4">
-          <motion.div
-            className="text-2xl font-black tracking-[-0.02em] bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(135deg, #8b5cf6, #22d3ee)" }}
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            Reading Your Aura...
-          </motion.div>
-          <div className="w-48 h-1 bg-white/[0.05] rounded-full overflow-hidden mx-auto">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-500"
-              initial={{ x: "-100%" }}
-              animate={{ x: "100%" }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-        </div>
-      </main>
-    );
+    return null;
   }
   // ── END LOADING ──────────────────────────────────────────
 

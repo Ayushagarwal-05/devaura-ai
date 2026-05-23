@@ -502,7 +502,8 @@ function HeroSection() {
           transition={{ duration: 0.6, delay: 0.35 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <motion.button
+          <motion.a
+            href="/analyze"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold text-base overflow-hidden shadow-[0_0_0_0_rgba(139,92,246,0)] hover:shadow-[0_0_0_4px_rgba(139,92,246,0.25)] transition-shadow duration-300"
@@ -520,16 +521,17 @@ function HeroSection() {
               Reveal My Aura
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
-          </motion.button>
+          </motion.a>
 
-          <motion.button
+          <motion.a
+            href="/results?username=ayu_buildss"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             className="px-8 py-4 rounded-2xl border border-white/10 bg-white/[0.04] text-white/70 font-semibold text-base hover:bg-white/[0.07] hover:border-white/20 hover:text-white transition-all duration-300 flex items-center gap-2"
           >
             <Eye className="w-5 h-5" />
             View Demo
-          </motion.button>
+          </motion.a>
         </motion.div>
 
         {/* Stats strip */}
