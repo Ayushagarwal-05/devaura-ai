@@ -468,7 +468,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-[-0.03em] leading-[0.88] mb-6"
+          className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-[-0.03em] leading-[0.98] mb-6"
         >
           <span className="text-white drop-shadow-[0_0_40px_rgba(139,92,246,0.25)]">Your Developer</span>
           <br />
@@ -567,15 +567,23 @@ function HeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute -bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
       >
-        <span className="text-xs text-white/20 font-mono tracking-widest uppercase">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-px h-8 bg-gradient-to-b from-white/20 to-transparent"
+        <span className="text-[10px] text-white/20 font-mono tracking-[0.3em] uppercase">
+          Scroll
+        </span>
+        <div className="relative h-10 w-px overflow-hidden">
+          <motion.div
+          animate={{ y: ["-100%", "200%"] }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-400 to-transparent"
         />
-      </motion.div>
+      </div>
+    </motion.div>
     </section>
   );
 }
@@ -595,7 +603,7 @@ function HowItWorksSection() {
           <span className="inline-flex items-center gap-2 text-violet-400 text-sm font-mono tracking-widest uppercase mb-4">
             <Code2 className="w-4 h-4" /> How It Works
           </span>
-          <h2 className="text-4xl sm:text-5xl font-black text-white leading-tight">
+          <h2 className="text-4xl sm:text-5xl font-black tracking-[-0.03em] text-white leading-[0.95]">
             Three steps to your
             <br />
             <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, #8b5cf6, #06b6d4)" }}>
@@ -695,7 +703,7 @@ function ArchetypesSection() {
           <span className="inline-flex items-center gap-2 text-orange-400 text-sm font-mono tracking-widest uppercase mb-4">
             <Crown className="w-4 h-4" /> Developer Archetypes
           </span>
-          <h2 className="text-4xl sm:text-5xl font-black text-white leading-tight">
+          <h2 className="text-4xl sm:text-5xl font-black tracking-[-0.03em] text-white leading-[0.95]">
             Which archetype
             <br />
             <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, #f97316, #8b5cf6)" }}>
