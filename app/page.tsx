@@ -883,27 +883,43 @@ function Navbar() {
 
   return (
     <motion.nav
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "border-b border-white/[0.06] bg-[#05050a]/80 backdrop-blur-xl"
+          ? "border-b border-white/[0.06] bg-[#05050a]/85 backdrop-blur-2xl shadow-[0_1px_0_rgba(255,255,255,0.04)]"
           : ""
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 
         {/* LOGO */}
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
+        <motion.div
+          className="flex items-center gap-2 cursor-pointer"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="relative w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center overflow-hidden">
+            <Sparkles className="w-3.5 h-3.5 text-white relative z-10" />
+
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
+              initial={{ x: "-150%" }}
+              animate={{ x: "150%" }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                repeatDelay: 3,
+                ease: "easeInOut",
+              }}
+            />
           </div>
 
-          <span className="text-white font-bold">
+          <span className="text-white font-bold tracking-tight">
             DevAura AI
           </span>
-        </div>
+        </motion.div>
 
         {/* NAV LINKS */}
         <div className="hidden md:flex items-center gap-8 text-sm text-white/40">
@@ -916,9 +932,11 @@ function Navbar() {
             <a
               key={l}
               href="#"
-              className="hover:text-white/80 transition-colors"
+              className="relative group hover:text-white/90 transition-colors duration-200 py-1"
             >
               {l}
+
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-violet-400 to-cyan-400 group-hover:w-full transition-all duration-300" />
             </a>
           ))}
         </div>
@@ -926,11 +944,15 @@ function Navbar() {
         {/* BUTTON */}
         <a href="/results?username=ayu_buildss">
           <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-semibold"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            className="relative px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-semibold overflow-hidden group"
           >
-            Get My Aura
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+            <span className="relative">
+              Get My Aura
+            </span>
           </motion.button>
         </a>
 
