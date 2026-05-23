@@ -3,15 +3,57 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+const STORAGE_KEY = "devaura:aura";
+
 export default function AnalyzePage() {
   const router = useRouter();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push("/results");
-    }, 4000);
+    let cancelled = false;
 
-    return () => clearTimeout(timer);
+    const loadAura = async () => {
+      const params = new URLSearchParams(
+        window.location.search
+      );
+      const username =
+        params.get("username") || "ayu_buildss";
+      const encodedUsername =
+        encodeURIComponent(username);
+
+      try {
+        const res = await fetch(
+          `/api/aura?username=${encodedUsername}`
+        );
+
+        const json = await res.json();
+
+        if (cancelled) return;
+
+        sessionStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            username,
+            data: json,
+          })
+        );
+
+        router.push(
+          `/results?username=${encodedUsername}`
+        );
+      } catch (error) {
+        if (cancelled) return;
+
+        router.push(
+          `/results?username=${encodedUsername}`
+        );
+      }
+    };
+
+    loadAura();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   return (

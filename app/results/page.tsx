@@ -4,10 +4,46 @@ import { domToPng } from "modern-screenshot";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+const STORAGE_KEY = "devaura:aura";
+
+const getInitialData = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const params = new URLSearchParams(
+    window.location.search
+  );
+  const username =
+    params.get("username") || "ayu_buildss";
+  const cached = sessionStorage.getItem(STORAGE_KEY);
+
+  if (!cached) return null;
+
+  try {
+    const parsed = JSON.parse(cached);
+
+    if (
+      parsed?.username === username &&
+      parsed?.data
+    ) {
+      return parsed.data;
+    }
+  } catch (error) {
+    return null;
+  }
+
+  return null;
+};
+
 export default function ResultsPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>(() =>
+    getInitialData()
+  );
 
   useEffect(() => {
+    if (data) return;
+
     async function loadAura() {
       const params = new URLSearchParams(
         window.location.search
@@ -15,18 +51,28 @@ export default function ResultsPage() {
 
       const username =
         params.get("username") || "ayu_buildss";
+      const encodedUsername =
+        encodeURIComponent(username);
 
       const res = await fetch(
-        `/api/aura?username=${username}`
+        `/api/aura?username=${encodedUsername}`
       );
 
       const json = await res.json();
+
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          username,
+          data: json,
+        })
+      );
 
       setData(json);
     }
 
     loadAura();
-  }, []);
+  }, [data]);
 
   if (!data) {
     return (
