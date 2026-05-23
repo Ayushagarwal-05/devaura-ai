@@ -279,7 +279,7 @@ export default function AnalyzePage() {
               </motion.div>
 
               {/* Headline line 1 — clipped rise */}
-              <div className="overflow-hidden">
+              <div className="overflow-visible py-3">
                 <motion.h1
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
