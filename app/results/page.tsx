@@ -29,7 +29,11 @@ const getInitialData = () => {
     ) {
       return parsed.data;
     }
-  } catch {
+  } catch (error) {
+    console.warn(
+      "Failed to parse cached aura data",
+      error
+    );
     return null;
   }
 
@@ -74,7 +78,11 @@ export default function ResultsPage() {
         );
 
         setData(json);
-      } catch {
+      } catch (error) {
+        console.error(
+          "Failed to load aura data",
+          error
+        );
         return;
       }
     }

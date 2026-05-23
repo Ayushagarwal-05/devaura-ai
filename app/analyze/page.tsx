@@ -44,8 +44,13 @@ export default function AnalyzePage() {
         router.push(
           `/results?username=${encodedUsername}`
         );
-      } catch {
+      } catch (error) {
         if (cancelled) return;
+
+        console.error(
+          "Failed to preload aura data",
+          error
+        );
 
         router.push(
           `/results?username=${encodedUsername}`
