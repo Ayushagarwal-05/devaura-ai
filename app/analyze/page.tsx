@@ -11,9 +11,10 @@ const EXIT_ANIM_MS       = 300;   // exit animation duration
 const POST_COMPLETE_MS   = 350;   // pause at 100% before exit starts
 
 function getUsernameFromSearch() {
-  if (typeof window === "undefined") return "ayu_buildss";
+  if (typeof window === "undefined") return "";
+
   const params = new URLSearchParams(window.location.search);
-  return params.get("username") || "ayu_buildss";
+  return params.get("username") || "";
 }
 
 // ─── EASING ───────────────────────────────────────────────────────────────────
@@ -47,6 +48,12 @@ const STAGES = [
 export default function AnalyzePage() {
   const router     = useRouter();
   const [username] = useState(getUsernameFromSearch);
+
+  useEffect(() => {
+    if (!username) {
+      router.push("/");
+    }
+  }, [username, router]);
 
   // ── Visual state ──────────────────────────────────────────
   const [progress,    setProgress]    = useState(0);

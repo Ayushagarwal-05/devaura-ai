@@ -9,7 +9,14 @@ const openai = new OpenAI({
 export async function GET(request: Request): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
-    const username = searchParams.get("username") || "ayu_buildss";
+    const username = searchParams.get("username");
+
+    if (!username) {
+      return NextResponse.json(
+        { error: "Username is required" },
+        { status: 400 }
+      );
+    }
 
     // ── Fetch developer profile ─────────────────────────────
     const profileRes = await fetch(

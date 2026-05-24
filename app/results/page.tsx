@@ -13,9 +13,10 @@ const AURA_CACHE_PREFIX = "devaura:aura:";
 const APP_URL = "https://devaura-ai-2mx4.vercel.app";
 
 function getUsernameFromSearch() {
-  if (typeof window === "undefined") return "ayu_buildss";
+  if (typeof window === "undefined") return "";
+
   const params = new URLSearchParams(window.location.search);
-  return params.get("username") || "ayu_buildss";
+  return params.get("username") || "";
 }
 
 // ─── EASE ─────────────────────────────────────────────────────────────────────
@@ -563,49 +564,119 @@ function ShareModal({
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 export default function ResultsPage() {
 
-  const [username] = useState(getUsernameFromSearch);
-  const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [data, setData] = useState<any>(() => {
-    if (typeof window === "undefined") return null;
-    const cacheKey = `${AURA_CACHE_PREFIX}${getUsernameFromSearch()}`;
-    try {
-      const cached = sessionStorage.getItem(cacheKey);
-      return cached ? JSON.parse(cached) : null;
-    } catch { return null; }
-  });
+  const [username, setUsername] = useState("");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (data) return;
+    setMounted(true);
+    setUsername(getUsernameFromSearch());
+  }, []);
+
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(
+    username !== "ayu_buildss"
+  );
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!username) {
+      setError("Missing username");
+      setLoading(false);
+      return;
+    }
+
     let active = true;
+
     const controller = new AbortController();
 
     async function loadAura() {
-      if (username === "ayu_buildss") {
-        setData({
-          profile: { name: "Ayush Agarwal", username: "ayu_buildss", bio: "AI builder crafting futuristic developer experiences.", reputation: 355, image: "https://avatars.githubusercontent.com/u/183745432?v=4" },
-          aura: { archetype: "Innovative Problem Solver", summary: "A highly creative builder who combines engineering with cinematic product thinking.", strengths: ["AI Product Thinking", "Frontend Experience Design", "Rapid MVP Building"], futurePrediction: "Likely to evolve into a strong AI product engineer focused on immersive developer tools.", auraScore: 88, vibe: "Cinematic AI Builder" },
-        });
-        return;
+      try {
+        setLoading(true);
+        setError("");
+
+        const cacheKey = `${AURA_CACHE_PREFIX}${username}`;
+
+        // ── Try cache first ─────────────────────
+        try {
+          const cached = sessionStorage.getItem(cacheKey);
+
+          if (cached) {
+            const parsed = JSON.parse(cached);
+
+            if (active) {
+              setData(parsed);
+              setLoading(false);
+            }
+
+            return;
+          }
+        } catch {
+          console.log("Cache parse failed");
+        }
+
+        // ── Fetch from API ──────────────────────
+        const res = await fetch(
+          `/api/aura?username=${encodeURIComponent(username)}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
+        );
+        
+        if (!res.ok) {
+          throw new Error("Failed to generate aura");
+        }
+
+        const json = await res.json();
+
+        if (!json?.profile || !json?.aura) {
+          throw new Error("Invalid aura response");
+        }
+
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify(json));
+        } catch {}
+
+        if (active) {
+          setData(json);
+        }
+
+      } catch (err) {
+        console.error(err);
+
+        if (active) {
+          setError("Failed to load aura");
+        }
+
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
-      const res = await fetch(`/api/aura?username=${encodeURIComponent(username)}`, { signal: controller.signal });
-      if (!res.ok) return;
-      const json = await res.json();
-      if (!active) return;
-      try { sessionStorage.setItem(`${AURA_CACHE_PREFIX}${username}`, JSON.stringify(json)); } catch {}
-      setData(json);
     }
 
     loadAura();
-    return () => { active = false; controller.abort(); };
-  }, [data, username]);
 
-  if (!data) return null;
+    return () => {
+      active = false;
+      controller.abort();
+    };
 
-  const profile = data.profile;
-  const aura    = data.aura;
-  const score   = Math.min(aura.auraScore, 100);
+  }, [username]);
 
-  const shareText = `My DevAura identity: ${aura.archetype} ⚡\n${aura.summary}\nAura Score: ${score}\nAnalyze yours → ${APP_URL}`;
+  const profile = data?.profile;
+  const aura = data?.aura;
+
+  const score = Math.min(
+    aura?.auraScore || 0,
+    100
+  );
+
+  const shareText = aura
+    ? `My DevAura identity: ${aura.archetype} ⚡\n${aura.summary}\nAura Score: ${score}\nAnalyze yours → ${APP_URL}`
+    : "";
 
   const handleDownload = useCallback(async () => {
     const CARD_WIDTH = 620;
@@ -634,6 +705,41 @@ export default function ResultsPage() {
       document.body.removeChild(wrapper);
     }
   }, [profile, aura, score]);
+
+  if (!mounted) {
+    return (
+      <main className="min-h-screen bg-[#05050a]" />
+    );
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#05050a]" />
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <main className="min-h-screen bg-[#05050a] text-white flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-bold mb-3">
+            Failed to load aura
+          </h1>
+
+          <p className="text-white/50 mb-6">
+            The profile could not be analyzed right now.
+          </p>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="px-5 py-3 rounded-xl bg-white text-black font-semibold"
+          >
+            Retry
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <motion.main

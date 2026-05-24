@@ -429,6 +429,49 @@ function DevAuraCard() {
   );
 }
 
+function HomeAuraButton() {
+  const [username, setUsername] = useState("");
+
+  const handleSubmit = () => {
+    if (!username.trim()) return;
+
+    window.location.href =
+      `/analyze?username=${encodeURIComponent(username.trim())}`;
+  };
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-xl mx-auto">
+
+      <input
+        type="text"
+        placeholder="Enter your daily.dev username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSubmit();
+          }
+        }}
+
+        className="w-full sm:flex-1 px-5 h-[58px] rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-violet-500/50"
+      />
+      <motion.button
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={handleSubmit}
+        className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold text-base overflow-hidden"
+      >
+
+        <span className="relative flex items-center gap-2">
+          <Zap className="w-5 h-5" />
+          Reveal My Aura
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </span>
+      </motion.button>
+    </div>
+  );
+}
+
 // ─── SECTIONS ────────────────────────────────────────────────────────────────
 
 function HeroSection() {
@@ -502,34 +545,16 @@ function HeroSection() {
           transition={{ duration: 0.6, delay: 0.35 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <motion.a
-            href="/analyze"
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold text-base overflow-hidden shadow-[0_0_0_0_rgba(139,92,246,0)] hover:shadow-[0_0_0_4px_rgba(139,92,246,0.25)] transition-shadow duration-300"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-cyan-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-            {/* Shimmer sweep on hover */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100"
-              initial={{ x: "-100%" }}
-              whileHover={{ x: "100%" }}
-              transition={{ duration: 0.6 }}
-            />
-            <span className="relative flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              Reveal My Aura
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </span>
-          </motion.a>
+          <HomeAuraButton />
 
           <motion.a
             href="/results?username=ayu_buildss"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            className="px-8 py-4 rounded-2xl border border-white/10 bg-white/[0.04] text-white/70 font-semibold text-base hover:bg-white/[0.07] hover:border-white/20 hover:text-white transition-all duration-300 flex items-center gap-2"
+            className="h-[58px] px-8 rounded-2xl border border-white/10 bg-white/[0.04] text-white/70 font-semibold text-base hover:bg-white/[0.07] hover:border-white/20 hover:text-white transition-all duration-300 flex items-center gap-2"
           >
             <Eye className="w-5 h-5" />
+            
             View Demo
           </motion.a>
         </motion.div>
@@ -860,19 +885,7 @@ function FinalCTASection() {
           your developer aura. Let DevAura AI reveal what it already knows about you.
         </p>
         <div className="flex flex-col items-center justify-center gap-3">
-          <motion.a
-            href="/analyze"
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            className="group relative px-10 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-bold text-base overflow-hidden"
-          >
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-white" />
-            <span className="relative flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              Start Your Analysis
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </span>
-          </motion.a>
+          <HomeAuraButton />
           <p className="text-white/20 text-sm">
             AI-generated developer identity powered by daily.dev
           </p>
@@ -971,7 +984,7 @@ function Navbar() {
         </motion.div>
 
         {/* NAV LINKS */}
-        <div className="hidden md:flex items-center gap-8 text-sm text-white/40">
+        <div className="hidden md:flex items-center gap-6 text-sm text-white/40 ml-4">
           {[
             { label: "How It Works", href: "#how-it-works" },
             { label: "Metrics", href: "#metrics" },
@@ -991,19 +1004,7 @@ function Navbar() {
         </div>
 
         {/* BUTTON */}
-        <a href="/analyze">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.96 }}
-            className="relative px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-semibold overflow-hidden group"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-            <span className="relative">
-              Get My Aura
-            </span>
-          </motion.button>
-        </a>
+        <HomeAuraButton />
 
       </div>
     </motion.nav>
