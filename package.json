@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "axios": "^1.16.1",
     "framer-motion": "^12.40.0",
     "html2canvas": "^1.4.1",

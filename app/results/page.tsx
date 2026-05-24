@@ -2,11 +2,15 @@
 
 import { domToPng } from "modern-screenshot";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { motion, useInView } from "framer-motion";
-import { Sparkles, TrendingUp, Share2, Download } from "lucide-react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import {
+  Share2, Download, X, Copy, Link2,
+  MessageCircle, Mail, ExternalLink, Check,
+} from "lucide-react";
 
 // ─── CACHE / URL HELPERS — UNCHANGED ─────────────────────────────────────────
 const AURA_CACHE_PREFIX = "devaura:aura:";
+const APP_URL = "https://devaura-ai-2mx4.vercel.app";
 
 function getUsernameFromSearch() {
   if (typeof window === "undefined") return "ayu_buildss";
@@ -60,8 +64,6 @@ function ScanLine() {
 }
 
 // ─── AURA RING ────────────────────────────────────────────────────────────────
-// Exported version: static (no animation), so the ring is always drawn at
-// full progress in the PNG — animation is only for the live page.
 function AuraRing({ score, isExport = false }: { score: number; isExport?: boolean }) {
   const r    = 28;
   const circ = 2 * Math.PI * r;
@@ -74,24 +76,11 @@ function AuraRing({ score, isExport = false }: { score: number; isExport?: boole
       <svg viewBox="0 0 72 72" width="72" height="72" className="-rotate-90">
         <circle cx="36" cy="36" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
         {isExport ? (
-          // Static circle for export — always fully drawn
-          <circle
-            cx="36" cy="36" r={r}
-            fill="none"
-            stroke="url(#ringGradExport)"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray={circ}
-            strokeDashoffset={offset}
-          />
+          <circle cx="36" cy="36" r={r} fill="none" stroke="url(#ringGradExport)"
+            strokeWidth="4" strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset} />
         ) : (
-          <motion.circle
-            cx="36" cy="36" r={r}
-            fill="none"
-            stroke="url(#ringGrad)"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray={circ}
+          <motion.circle cx="36" cy="36" r={r} fill="none" stroke="url(#ringGrad)"
+            strokeWidth="4" strokeLinecap="round" strokeDasharray={circ}
             initial={{ strokeDashoffset: circ }}
             animate={inView ? { strokeDashoffset: offset } : {}}
             transition={{ delay: 0.6, duration: 1.6, ease: E }}
@@ -120,181 +109,84 @@ function AuraRing({ score, isExport = false }: { score: number; isExport?: boole
   );
 }
 
-// ─── CARD INNER — used for both live UI and PNG export ────────────────────────
-// Accepts `isExport` so animations/motion props are stripped for the snapshot.
-function CardInner({
-  profile,
-  aura,
-  score,
-  isExport = false,
-}: {
-  profile: any;
-  aura: any;
-  score: number;
-  isExport?: boolean;
+// ─── CARD INNER — UNCHANGED ───────────────────────────────────────────────────
+function CardInner({ profile, aura, score, isExport = false }: {
+  profile: any; aura: any; score: number; isExport?: boolean;
 }) {
   const wrap = (content: React.ReactNode, delay: number, extraClass = "") => {
     if (isExport) return <div className={extraClass}>{content}</div>;
     return (
-      <motion.div
-        className={extraClass}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay, duration: 0.55, ease: E }}
-      >
+      <motion.div className={extraClass}
+        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ delay, duration: 0.55, ease: E }}>
         {content}
       </motion.div>
     );
   };
 
   return (
-    <div
-      style={{
-        background: "linear-gradient(145deg, rgba(13,13,26,0.99) 0%, rgba(7,7,18,1) 100%)",
-        border: "1px solid rgba(255,255,255,0.09)",
-        borderRadius: 20,
-        overflow: "hidden",
-        position: "relative",
-        boxShadow: isExport
-          ? "none"
-          : "0 0 0 1px rgba(139,92,246,0.1), 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(139,92,246,0.07)",
-      }}
-    >
-      {/* Top accent */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 1,
-        background: "linear-gradient(90deg, transparent, rgba(139,92,246,0.7), transparent)",
-      }} />
-      {/* Corner glow TR */}
-      <div style={{
-        position: "absolute", top: 0, right: 0, width: 200, height: 160, pointerEvents: "none",
-        background: "radial-gradient(circle at 90% 0%, rgba(139,92,246,0.16) 0%, transparent 70%)",
-      }} />
-      {/* Corner glow BL */}
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, width: 160, height: 160, pointerEvents: "none",
-        background: "radial-gradient(circle at 0% 100%, rgba(34,211,238,0.10) 0%, transparent 70%)",
-      }} />
+    <div style={{
+      background: "linear-gradient(145deg, rgba(13,13,26,0.99) 0%, rgba(7,7,18,1) 100%)",
+      border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, overflow: "hidden",
+      position: "relative",
+      boxShadow: isExport ? "none" : "0 0 0 1px rgba(139,92,246,0.1), 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(139,92,246,0.07)",
+    }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(139,92,246,0.7), transparent)" }} />
+      <div style={{ position: "absolute", top: 0, right: 0, width: 200, height: 160, pointerEvents: "none", background: "radial-gradient(circle at 90% 0%, rgba(139,92,246,0.16) 0%, transparent 70%)" }} />
+      <div style={{ position: "absolute", bottom: 0, left: 0, width: 160, height: 160, pointerEvents: "none", background: "radial-gradient(circle at 0% 100%, rgba(34,211,238,0.10) 0%, transparent 70%)" }} />
 
-      {/* ── HEADER BAR ─────────────────────────────── */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "14px 24px 12px",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
-      }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px 12px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{
-            width: 8, height: 8, borderRadius: "50%", background: "#8b5cf6",
-            boxShadow: "0 0 8px #8b5cf6",
-          }} />
-          <span style={{
-            fontFamily: "monospace", fontSize: 10, color: "rgba(139,92,246,0.85)",
-            letterSpacing: "0.3em", textTransform: "uppercase",
-          }}>DevAura AI</span>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#8b5cf6", boxShadow: "0 0 8px #8b5cf6" }} />
+          <span style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(139,92,246,0.85)", letterSpacing: "0.3em", textTransform: "uppercase" }}>DevAura AI</span>
         </div>
-        <span style={{
-          fontFamily: "monospace", fontSize: 10, color: "rgba(255,255,255,0.15)",
-          letterSpacing: "0.2em",
-        }}>identity.v1</span>
+        <span style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(255,255,255,0.15)", letterSpacing: "0.2em" }}>identity.v1</span>
       </div>
 
-      {/* ── PROFILE ROW ────────────────────────────── */}
+      {/* Profile row */}
       <div style={{ padding: "20px 24px 16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {/* Avatar */}
           <div style={{ position: "relative", flexShrink: 0 }}>
-            {/* Dashed spin ring — only on live, skip for export (CSS animation doesn't capture) */}
             {!isExport && (
               <>
-                <div className="absolute -inset-2 rounded-full border border-dashed border-cyan-500/20"
-                  style={{ animation: "spin-slow 14s linear infinite" }} />
-                <div className="absolute -inset-3.5 rounded-full border border-dotted border-violet-500/10"
-                  style={{ animation: "spin-rev 20s linear infinite" }} />
+                <div className="absolute -inset-2 rounded-full border border-dashed border-cyan-500/20" style={{ animation: "spin-slow 14s linear infinite" }} />
+                <div className="absolute -inset-3.5 rounded-full border border-dotted border-violet-500/10" style={{ animation: "spin-rev 20s linear infinite" }} />
               </>
             )}
-            <img
-              src={profile.image}
-              alt={profile.name}
-              style={{
-                width: 56, height: 56, borderRadius: 14, objectFit: "cover",
-                border: "1.5px solid rgba(34,211,238,0.35)",
-                boxShadow: "0 0 20px rgba(34,211,238,0.3), 0 0 50px rgba(34,211,238,0.08)",
-                display: "block", position: "relative", zIndex: 1,
-              }}
-            />
-            {/* Online dot */}
-            <div style={{
-              position: "absolute", bottom: -2, right: -2, zIndex: 2,
-              width: 12, height: 12, borderRadius: "50%", background: "#10b981",
-              border: "2px solid #05050a",
-            }} />
+            <img src={profile.image} alt={profile.name} style={{ width: 56, height: 56, borderRadius: 14, objectFit: "cover", border: "1.5px solid rgba(34,211,238,0.35)", boxShadow: "0 0 20px rgba(34,211,238,0.3), 0 0 50px rgba(34,211,238,0.08)", display: "block", position: "relative", zIndex: 1 }} />
+            <div style={{ position: "absolute", bottom: -2, right: -2, zIndex: 2, width: 12, height: 12, borderRadius: "50%", background: "#10b981", border: "2px solid #05050a" }} />
           </div>
-
-          {/* Name + handle */}
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{
-              fontSize: 24, fontWeight: 900, color: "#fff",
-              letterSpacing: "-0.025em", lineHeight: 1.15,
-              wordBreak: "break-word",
-            }}>{profile.name}</div>
-            <div style={{
-              fontFamily: "monospace", fontSize: 13, color: "#22d3ee",
-              marginTop: 3, wordBreak: "break-all",
-            }}>@{profile.username} · daily.dev</div>
-            {aura.vibe && (
-              <div style={{
-                fontFamily: "monospace", fontSize: 11, color: "rgba(255,255,255,0.32)",
-                marginTop: 2,
-              }}>{aura.vibe}</div>
-            )}
+            <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.15, wordBreak: "break-word" }}>{profile.name}</div>
+            <div style={{ fontFamily: "monospace", fontSize: 13, color: "#22d3ee", marginTop: 3, wordBreak: "break-all" }}>@{profile.username} · daily.dev</div>
+            {aura.vibe && <div style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(255,255,255,0.32)", marginTop: 2 }}>{aura.vibe}</div>}
           </div>
-
-          {/* Aura ring */}
           <AuraRing score={score} isExport={isExport} />
         </div>
       </div>
 
-      {/* Divider */}
       <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
 
-      {/* ── ARCHETYPE ──────────────────────────────── */}
+      {/* Archetype */}
       {wrap(
-        <div style={{
-          borderRadius: 14, overflow: "hidden", position: "relative",
-          background: "linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(34,211,238,0.05) 100%)",
-          border: "1px solid rgba(139,92,246,0.25)",
-          padding: "14px 16px",
-        }}>
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(90deg, rgba(139,92,246,0.06), transparent)",
-            pointerEvents: "none",
-          }} />
+        <div style={{ borderRadius: 14, overflow: "hidden", position: "relative", background: "linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(34,211,238,0.05) 100%)", border: "1px solid rgba(139,92,246,0.25)", padding: "14px 16px" }}>
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(139,92,246,0.06), transparent)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
               <span style={{ fontSize: 11, color: "rgba(139,92,246,0.75)" }}>✦</span>
-              <span style={{
-                fontFamily: "monospace", fontSize: 9, color: "rgba(139,92,246,0.7)",
-                letterSpacing: "0.32em", textTransform: "uppercase",
-              }}>Archetype</span>
+              <span style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(139,92,246,0.7)", letterSpacing: "0.32em", textTransform: "uppercase" }}>Archetype</span>
             </div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
-              {aura.archetype}
-            </div>
-            {aura.vibe && (
-              <div style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>
-                {aura.vibe} · Tier I
-              </div>
-            )}
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.2 }}>{aura.archetype}</div>
+            {aura.vibe && <div style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>{aura.vibe} · Tier I</div>}
           </div>
         </div>,
-        0.34, "px-6 py-4" // only used in live view
+        0.34, "px-6 py-4"
       )}
 
-      {/* Divider */}
       <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
 
-      {/* ── METRICS ────────────────────────────────── */}
+      {/* Metrics */}
       {wrap(
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {[
@@ -302,146 +194,377 @@ function CardInner({
             { label: "Aura Score", value: score,                       color: "#22d3ee" },
             { label: "Strengths",  value: aura.strengths?.length ?? 0, color: "#fb923c" },
           ].map((m) => (
-            <div key={m.label} style={{
-              display: "flex", flexDirection: "column", alignItems: "center",
-              justifyContent: "center", padding: "14px 8px",
-              borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)",
-              background: "rgba(255,255,255,0.03)",
-            }}>
-              <span style={{ fontSize: 22, fontWeight: 900, color: m.color, fontVariantNumeric: "tabular-nums" }}>
-                {m.value}
-              </span>
-              <span style={{
-                fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.28)",
-                textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 3,
-              }}>{m.label}</span>
+            <div key={m.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "14px 8px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.03)" }}>
+              <span style={{ fontSize: 22, fontWeight: 900, color: m.color, fontVariantNumeric: "tabular-nums" }}>{m.value}</span>
+              <span style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 3 }}>{m.label}</span>
             </div>
           ))}
         </div>,
         0.42, "px-6 py-4"
       )}
 
-      {/* Divider */}
       <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
 
-      {/* ── STRENGTHS ──────────────────────────────── */}
+      {/* Strengths */}
       {aura.strengths?.length > 0 && wrap(
         <>
-          <div style={{
-            fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.2)",
-            textTransform: "uppercase", letterSpacing: "0.3em", marginBottom: 10,
-          }}>Strength Matrix</div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 8,
-            }}
-          >
+          <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.3em", marginBottom: 10 }}>Strength Matrix</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {aura.strengths.map((s: string, i: number) => (
-              <span key={i} style={{
-                padding: "7px 14px", borderRadius: 8,
-                border: "1px solid rgba(255,255,255,0.09)",
-                background: "rgba(255,255,255,0.04)",
-                fontFamily: "monospace", fontSize: 12, color: "rgba(255,255,255,0.55)",
-              }}>{s}</span>
+              <span key={i} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.09)", background: "rgba(255,255,255,0.04)", fontFamily: "monospace", fontSize: 12, color: "rgba(255,255,255,0.55)" }}>{s}</span>
             ))}
           </div>
         </>,
         0.50, "px-6 py-4"
       )}
 
-      {/* Divider */}
       <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
 
-      {/* ── PERSONALITY SUMMARY ────────────────────── */}
+      {/* Summary */}
       {wrap(
         <>
-          <div style={{
-            fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.2)",
-            textTransform: "uppercase", letterSpacing: "0.3em", marginBottom: 8,
-          }}>Personality Summary</div>
-          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.62)", lineHeight: 1.65 }}>
-            {aura.summary}
-          </div>
+          <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.3em", marginBottom: 8 }}>Personality Summary</div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.62)", lineHeight: 1.65 }}>{aura.summary}</div>
         </>,
         0.56, "px-6 py-4"
       )}
 
-      {/* Divider */}
       <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
 
-      {/* ── AI PREDICTION ──────────────────────────── */}
+      {/* Prediction */}
       {wrap(
-        <div style={{
-          borderRadius: 14, overflow: "hidden",
-          background: "linear-gradient(135deg, rgba(34,211,238,0.07) 0%, rgba(139,92,246,0.05) 100%)",
-          border: "1px solid rgba(34,211,238,0.20)",
-          padding: "14px 16px",
-        }}>
+        <div style={{ borderRadius: 14, overflow: "hidden", background: "linear-gradient(135deg, rgba(34,211,238,0.07) 0%, rgba(139,92,246,0.05) 100%)", border: "1px solid rgba(34,211,238,0.20)", padding: "14px 16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <span style={{ fontSize: 11, color: "#22d3ee", opacity: 0.8 }}>↗</span>
-            <span style={{
-              fontFamily: "monospace", fontSize: 9, color: "rgba(34,211,238,0.65)",
-              letterSpacing: "0.3em", textTransform: "uppercase",
-            }}>AI Prediction</span>
+            <span style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(34,211,238,0.65)", letterSpacing: "0.3em", textTransform: "uppercase" }}>AI Prediction</span>
           </div>
-          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }}>
-            {aura.futurePrediction}
-          </div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }}>{aura.futurePrediction}</div>
         </div>,
         0.64, "px-6 py-4"
       )}
 
-      {/* ── BIO ────────────────────────────────────── */}
+      {/* Bio */}
       {profile.bio && (
         <>
           <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
           {wrap(
             <>
-              <div style={{
-                fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.18)",
-                textTransform: "uppercase", letterSpacing: "0.3em", marginBottom: 6,
-              }}>Bio</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.40)", lineHeight: 1.6 }}>
-                {profile.bio}
-              </div>
+              <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.18)", textTransform: "uppercase", letterSpacing: "0.3em", marginBottom: 6 }}>Bio</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.40)", lineHeight: 1.6 }}>{profile.bio}</div>
             </>,
             0.70, "px-6 py-4"
           )}
         </>
       )}
 
-      {/* ── CARD FOOTER ────────────────────────────── */}
+      {/* Footer */}
       <div style={{ margin: "0 24px", height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
-      <div style={{
-        padding: "12px 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <span style={{
-          fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.1)",
-          textTransform: "uppercase", letterSpacing: "0.3em",
-        }}>DEVAURA·IDENTITY</span>
+      <div style={{ padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.1)", textTransform: "uppercase", letterSpacing: "0.3em" }}>DEVAURA·IDENTITY</span>
         <div style={{ display: "flex", gap: 5 }}>
           {[...Array(5)].map((_, i) => (
-            <div key={i} style={{
-              width: 6, height: 6, borderRadius: "50%",
-              background: i < 4 ? "rgba(139,92,246,0.6)" : "rgba(255,255,255,0.08)",
-            }} />
+            <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: i < 4 ? "rgba(139,92,246,0.6)" : "rgba(255,255,255,0.08)" }} />
           ))}
         </div>
       </div>
-      {/* Bottom accent line */}
       <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(34,211,238,0.3), transparent)" }} />
     </div>
+  );
+}
+
+// ─── INLINE SOCIAL ICONS (no lucide dependency) ───────────────────────────────
+const IconX = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+const IconLinkedIn = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+  </svg>
+);
+
+const IconReddit = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+    <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z" />
+  </svg>
+);
+
+// ─── SHARE MODAL ──────────────────────────────────────────────────────────────
+function ShareModal({
+  open, onClose, shareText, shareUrl, archetype, onDownload,
+}: {
+  open: boolean;
+  onClose: () => void;
+  shareText: string;
+  shareUrl: string;
+  archetype: string;
+  onDownload: () => void;
+}) {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const copyWithFeedback = async (key: string, text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const enc  = encodeURIComponent;
+  const eT   = enc(shareText);
+  const eU   = enc(shareUrl);
+
+  const ACTIONS = [
+    {
+      key: "text",
+      icon: <Copy className="w-4 h-4" />,
+      label: "Copy Aura",
+      sublabel: "Full identity text",
+      color: "#8b5cf6",
+      glow: "rgba(139,92,246,0.25)",
+      action: () => copyWithFeedback("text", shareText),
+    },
+    {
+      key: "link",
+      icon: <Link2 className="w-4 h-4" />,
+      label: "Copy Link",
+      sublabel: "App URL",
+      color: "#22d3ee",
+      glow: "rgba(34,211,238,0.25)",
+      action: () => copyWithFeedback("link", shareUrl),
+    },
+    {
+      key: "download",
+      icon: <Download className="w-4 h-4" />,
+      label: "Download PNG",
+      sublabel: "High-res identity card",
+      color: "#fb923c",
+      glow: "rgba(251,146,60,0.25)",
+      action: () => { onDownload(); onClose(); },
+    },
+    {
+      key: "twitter",
+      icon: <IconX />,
+      label: "X / Twitter",
+      sublabel: "Post your aura",
+      color: "#e2e8f0",
+      glow: "rgba(226,232,240,0.15)",
+      action: () => window.open(`https://twitter.com/intent/tweet?text=${eT}`, "_blank"),
+    },
+    {
+      key: "linkedin",
+      icon: <IconLinkedIn />,
+      label: "LinkedIn",
+      sublabel: "Share professionally",
+      color: "#0a66c2",
+      glow: "rgba(10,102,194,0.3)",
+      action: () => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${eU}&summary=${eT}`, "_blank"),
+    },
+    {
+      key: "whatsapp",
+      icon: <MessageCircle className="w-4 h-4" />,
+      label: "WhatsApp",
+      sublabel: "Send to contacts",
+      color: "#25d366",
+      glow: "rgba(37,211,102,0.25)",
+      action: () => window.open(`https://api.whatsapp.com/send?text=${eT}`, "_blank"),
+    },
+    {
+      key: "reddit",
+      icon: <IconReddit />,
+      label: "Reddit",
+      sublabel: "Share on Reddit",
+      color: "#ff4500",
+      glow: "rgba(255,69,0,0.25)",
+      action: () => window.open(`https://reddit.com/submit?url=${eU}&title=${eT}`, "_blank"),
+    },
+    {
+      key: "email",
+      icon: <Mail className="w-4 h-4" />,
+      label: "Email",
+      sublabel: "Send by email",
+      color: "#94a3b8",
+      glow: "rgba(148,163,184,0.2)",
+      action: () => window.open(`mailto:?subject=My DevAura Identity&body=${eT}`, "_blank"),
+    },
+  ] as const;
+
+  const hasNativeShare = typeof navigator !== "undefined" && !!navigator.share;
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            key="backdrop"
+            className="fixed inset-0 z-50"
+            style={{ background: "rgba(4,4,10,0.75)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={onClose}
+          />
+
+          <motion.div
+            key="modal"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+          >
+            <motion.div
+              className="relative w-full pointer-events-auto"
+              style={{ maxWidth: 420 }}
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={{ duration: 0.35, ease: E }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="relative overflow-hidden"
+                style={{
+                  borderRadius: 20,
+                  background: "linear-gradient(145deg, rgba(13,13,28,0.97) 0%, rgba(7,7,18,0.99) 100%)",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  boxShadow: "0 0 0 1px rgba(139,92,246,0.15), 0 32px 80px rgba(0,0,0,0.8), 0 0 60px rgba(139,92,246,0.10)",
+                }}
+              >
+                {/* Top accent */}
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(139,92,246,0.8), rgba(34,211,238,0.5), transparent)" }} />
+                {/* Corner glow */}
+                <div style={{ position: "absolute", top: 0, right: 0, width: 200, height: 150, pointerEvents: "none", background: "radial-gradient(circle at 90% 0%, rgba(139,92,246,0.18) 0%, transparent 65%)" }} />
+
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 pt-5 pb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#8b5cf6", boxShadow: "0 0 8px #8b5cf6" }} />
+                      <span className="text-[9px] font-mono text-violet-400/70 tracking-[0.32em] uppercase">DevAura AI</span>
+                    </div>
+                    <h2 className="text-lg font-black text-white tracking-tight">Share Your Aura</h2>
+                    <p className="text-white/30 text-xs font-mono mt-0.5 truncate max-w-[260px]">{archetype}</p>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={onClose}
+                    className="flex items-center justify-center w-8 h-8 rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/40 hover:text-white hover:border-white/20 transition-colors duration-200"
+                  >
+                    <X className="w-4 h-4" />
+                  </motion.button>
+                </div>
+
+                <div className="mx-5 h-px bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" />
+
+                {/* Share preview */}
+                <div className="mx-5 mt-4 mb-4 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <p className="text-[9px] font-mono text-white/20 uppercase tracking-[0.3em] mb-2">Share Preview</p>
+                  <p className="text-white/50 text-xs font-mono leading-relaxed line-clamp-3">{shareText}</p>
+                </div>
+
+                <div className="mx-5 h-px bg-gradient-to-r from-transparent via-white/[0.07] to-transparent mb-4" />
+
+                {/* Action grid */}
+                <div className="px-5 pb-2 grid grid-cols-2 gap-2">
+                  {ACTIONS.map((action) => {
+                    const isCopied = copied === action.key;
+                    return (
+                      <motion.button
+                        key={action.key}
+                        whileHover={{ scale: 1.02, y: -1 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={action.action}
+                        className="group relative flex items-center gap-3 px-3.5 py-3 rounded-xl border border-white/[0.07] bg-white/[0.03] text-left overflow-hidden"
+                        style={{ transition: "border-color 0.2s, box-shadow 0.2s" }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.borderColor = `${action.color}40`;
+                          (e.currentTarget as HTMLElement).style.boxShadow = `0 0 16px ${action.glow}`;
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
+                          (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                        }}
+                      >
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{ background: `radial-gradient(ellipse at 0% 50%, ${action.glow} 0%, transparent 70%)` }} />
+                        <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
+                          style={{ background: `${action.color}18`, color: isCopied ? "#34d399" : action.color }}>
+                          {isCopied ? <Check className="w-4 h-4" /> : action.icon}
+                        </div>
+                        <div className="relative z-10 min-w-0">
+                          <p className="text-white/80 text-sm font-semibold leading-tight truncate">
+                            {isCopied ? "Copied!" : action.label}
+                          </p>
+                          <p className="text-white/25 text-[10px] font-mono mt-0.5 truncate">{action.sublabel}</p>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+
+                  {hasNativeShare && (
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={async () => {
+                        try { await navigator.share({ title: "My DevAura Identity", text: shareText, url: shareUrl }); } catch {}
+                      }}
+                      className="group relative flex items-center gap-3 px-3.5 py-3 rounded-xl border border-white/[0.07] bg-white/[0.03] text-left overflow-hidden col-span-2"
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,92,246,0.4)";
+                        (e.currentTarget as HTMLElement).style.boxShadow = "0 0 16px rgba(139,92,246,0.2)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
+                        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                      }}
+                    >
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.08) 0%, transparent 70%)" }} />
+                      <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
+                        style={{ background: "rgba(139,92,246,0.18)", color: "#8b5cf6" }}>
+                        <ExternalLink className="w-4 h-4" />
+                      </div>
+                      <div className="relative z-10">
+                        <p className="text-white/80 text-sm font-semibold leading-tight">Native Share</p>
+                        <p className="text-white/25 text-[10px] font-mono mt-0.5">Use system share sheet</p>
+                      </div>
+                    </motion.button>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="px-5 py-4 mt-1 flex items-center justify-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-violet-500/40" />
+                  <span className="text-white/10 text-[9px] font-mono tracking-[0.3em] uppercase">DevAura AI · devaura-ai.vercel.app</span>
+                  <div className="w-1 h-1 rounded-full bg-cyan-500/40" />
+                </div>
+
+                <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(34,211,238,0.3), transparent)" }} />
+              </div>
+            </motion.div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 export default function ResultsPage() {
 
-  // ── ALL ORIGINAL LOGIC — UNCHANGED ───────────────────────
   const [username] = useState(getUsernameFromSearch);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const [data, setData] = useState<any>(() => {
     if (typeof window === "undefined") return null;
     const cacheKey = `${AURA_CACHE_PREFIX}${getUsernameFromSearch()}`;
@@ -459,20 +582,8 @@ export default function ResultsPage() {
     async function loadAura() {
       if (username === "ayu_buildss") {
         setData({
-          profile: {
-            name: "Ayush Agarwal", username: "ayu_buildss",
-            bio: "AI builder crafting futuristic developer experiences.",
-            reputation: 355,
-            image: "https://avatars.githubusercontent.com/u/183745432?v=4&size=512",
-          },
-          aura: {
-            archetype: "Innovative Problem Solver",
-            summary: "A highly creative builder who combines engineering with cinematic product thinking.",
-            strengths: ["AI Product Thinking", "Frontend Experience Design", "Rapid MVP Building"],
-            futurePrediction: "Likely to evolve into a strong AI product engineer focused on immersive developer tools.",
-            auraScore: 88,
-            vibe: "Cinematic AI Builder",
-          },
+          profile: { name: "Ayush Agarwal", username: "ayu_buildss", bio: "AI builder crafting futuristic developer experiences.", reputation: 355, image: "https://avatars.githubusercontent.com/u/183745432?v=4" },
+          aura: { archetype: "Innovative Problem Solver", summary: "A highly creative builder who combines engineering with cinematic product thinking.", strengths: ["AI Product Thinking", "Frontend Experience Design", "Rapid MVP Building"], futurePrediction: "Likely to evolve into a strong AI product engineer focused on immersive developer tools.", auraScore: 88, vibe: "Cinematic AI Builder" },
         });
         return;
       }
@@ -488,70 +599,32 @@ export default function ResultsPage() {
     return () => { active = false; controller.abort(); };
   }, [data, username]);
 
-  
+  if (!data) return null;
 
-  const profile = data?.profile;
-  const aura    = data?.aura;
-  const score   = Math.min(aura?.auraScore ?? 0, 100);
+  const profile = data.profile;
+  const aura    = data.aura;
+  const score   = Math.min(aura.auraScore, 100);
 
-  // ── SHARE HANDLER — UNCHANGED ────────────────────────────
-  const handleShare = () => {
-    navigator.clipboard.writeText(
-      `My DevAura identity: ${aura.archetype} ⚡
+  const shareText = `My DevAura identity: ${aura.archetype} ⚡\n${aura.summary}\nAura Score: ${score}\nAnalyze yours → ${APP_URL}`;
 
-  ${aura.summary}
-
-  Aura Score: ${score}
-
-  Analyze yours → https://devaura-ai-2mx4.vercel.app/`
-    );
-
-    alert("DevAura identity copied.");
-  };
-
-  // ── DOWNLOAD HANDLER — REBUILT ────────────────────────────
-  // Strategy:
-  //   1. Build a fully off-screen, static clone of the card in a hidden div.
-  //      The clone uses inline styles (no Tailwind/animation), so domToPng
-  //      captures exactly what we compose — no layout shift, no blurry text.
-  //   2. Inject it into the real DOM briefly (domToPng needs it mounted),
-  //      capture at 2× pixel ratio, then remove it.
-  //   3. No scale transform tricks — those cause the distortion in the original.
   const handleDownload = useCallback(async () => {
-    // Create a container that's off-screen but has a fixed known width
-    const CARD_WIDTH = 620; // px — the exact export width
-
+    const CARD_WIDTH = 620;
     const wrapper = document.createElement("div");
     wrapper.style.cssText = `
-      position: fixed;
-      top: -9999px;
-      left: -9999px;
-      width: ${CARD_WIDTH}px;
-      background: #05050a;
-      padding: 32px;
+      position: fixed; top: -9999px; left: -9999px;
+      width: ${CARD_WIDTH}px; background: #05050a; padding: 32px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       -webkit-font-smoothing: antialiased;
     `;
     document.body.appendChild(wrapper);
-
-    // Render the static card clone into the wrapper
     const { createRoot } = await import("react-dom/client");
     const root = createRoot(wrapper);
-
     await new Promise<void>((resolve) => {
-      root.render(
-        <CardInner profile={profile} aura={aura} score={score} isExport={true} />
-      );
-      // Give React one tick to flush the render
+      root.render(<CardInner profile={profile} aura={aura} score={score} isExport={true} />);
       setTimeout(resolve, 120);
     });
-
     try {
-      const dataUrl = await domToPng(wrapper, {
-        scale: 2,           // 2× = crisp on retina without distortion
-        quality: 1,
-      });
-
+      const dataUrl = await domToPng(wrapper, { scale: 2, quality: 1 });
       const link    = document.createElement("a");
       link.download = `${profile.username}-aura.png`;
       link.href     = dataUrl;
@@ -561,7 +634,7 @@ export default function ResultsPage() {
       document.body.removeChild(wrapper);
     }
   }, [profile, aura, score]);
-  if (!data) return null;
+
   return (
     <motion.main
       className="min-h-screen bg-[#05050a] text-white relative overflow-x-hidden flex flex-col items-center justify-start py-8 px-4"
@@ -569,34 +642,26 @@ export default function ResultsPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* ── KEYFRAMES ──────────────────────────────────── */}
       <style>{`
         @keyframes spin-slow  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
         @keyframes spin-rev   { from { transform: rotate(360deg); } to { transform: rotate(0deg);    } }
       `}</style>
 
-      {/* ── FIXED BACKGROUND ───────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none"
-        style={{
-          backgroundImage: "linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
+        style={{ backgroundImage: "linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px" }}
       />
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div className="absolute rounded-full blur-[120px] opacity-20"
           style={{ width: 800, height: 600, top: "-10%", left: "50%", translateX: "-50%", background: "#8b5cf6" }}
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div className="absolute rounded-full blur-[120px] opacity-15"
           style={{ width: 500, height: 500, top: "40%", right: "-10%", background: "#22d3ee" }}
-          animate={{ y: [0, -24, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          animate={{ y: [0, -24, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
         <motion.div className="absolute rounded-full blur-[120px] opacity-10"
           style={{ width: 400, height: 400, bottom: "-5%", left: "-5%", background: "#fb923c" }}
-          animate={{ y: [0, -16, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          animate={{ y: [0, -16, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
         {PARTICLES.map((p, i) => (
           <motion.div key={i} className="absolute rounded-full"
@@ -608,15 +673,19 @@ export default function ResultsPage() {
       </div>
       <ScanLine />
 
-      {/* ═══════════════════════════════════════════════════════
-          LAYOUT
-      ═══════════════════════════════════════════════════════ */}
+      <ShareModal
+        open={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        shareText={shareText}
+        shareUrl={APP_URL}
+        archetype={aura.archetype}
+        onDownload={handleDownload}
+      />
+
       <div className="relative z-20 w-full mx-auto flex flex-col gap-4" style={{ maxWidth: 620 }}>
 
-        {/* ── EYEBROW ────────────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: E }}
           className="flex items-center justify-between px-1"
         >
@@ -625,19 +694,15 @@ export default function ResultsPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
             </span>
-            <span className="text-white/30 text-[10px] font-mono tracking-[0.3em] uppercase">
-              Identity Decoded · {username}
-            </span>
+            <span className="text-white/30 text-[10px] font-mono tracking-[0.3em] uppercase">Identity Decoded · {username}</span>
           </div>
         </motion.div>
 
-        {/* ── LIVE CARD ──────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.85, ease: E }}
         >
-          {/* Holographic sweep — live only */}
           <div className="relative" style={{ borderRadius: 20, overflow: "hidden" }}>
             <motion.div
               className="absolute inset-y-0 w-1/4 pointer-events-none z-10"
@@ -650,17 +715,15 @@ export default function ResultsPage() {
           </div>
         </motion.div>
 
-        {/* ── ACTION BUTTONS ─────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.82, duration: 0.5, ease: E }}
           className="flex gap-3 capture-hide"
         >
           <motion.button
             whileHover={{ scale: 1.03, y: -1 }}
             whileTap={{ scale: 0.97 }}
-            onClick={handleShare}
+            onClick={() => setShareModalOpen(true)}
             className="group relative flex-1 flex items-center justify-center gap-2 py-3 rounded-xl overflow-hidden font-bold text-sm text-black"
             style={{ background: "linear-gradient(135deg, #22d3ee 0%, #8b5cf6 100%)" }}
           >
@@ -680,17 +743,13 @@ export default function ResultsPage() {
           </motion.button>
         </motion.div>
 
-        {/* ── FOOTER ─────────────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           transition={{ delay: 1.0, duration: 0.6 }}
           className="flex items-center justify-center gap-2 py-1 capture-hide"
         >
           <div className="w-1 h-1 rounded-full bg-violet-500/40" />
-          <span className="text-white/15 text-[10px] font-mono tracking-[0.3em] uppercase">
-            DevAura AI · Powered by daily.dev
-          </span>
+          <span className="text-white/15 text-[10px] font-mono tracking-[0.3em] uppercase">DevAura AI · Powered by daily.dev</span>
           <div className="w-1 h-1 rounded-full bg-cyan-500/40" />
         </motion.div>
 
