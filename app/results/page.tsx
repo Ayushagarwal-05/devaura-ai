@@ -548,7 +548,6 @@ export default function ResultsPage() {
 
     try {
       const dataUrl = await domToPng(wrapper, {
-        bgcolor: "#05050a",
         scale: 2,           // 2× = crisp on retina without distortion
         quality: 1,
       });
