@@ -1,6 +1,12 @@
 # DevAura AI ⚡
 
+## 🔗 Live Demo
+
+https://devaura-ai-2mx4.vercel.app/
+
 > Cinematic AI-powered developer identity generation platform.
+
+Built for the daily.dev Hackathon 2026.
 
 DevAura AI transforms developer profiles into immersive, futuristic identity cards powered by AI analysis, cinematic UI systems, and high-quality social-share exports.
 
@@ -105,9 +111,11 @@ Then generates:
 
 ---
 
-## ⚡ Screenshots
+## ⚡ Live Experience
 
-*Add screenshots here after deployment.*
+Explore the live platform and generate your own developer aura:
+
+https://devaura-ai-2mx4.vercel.app/
 
 ---
 
@@ -133,7 +141,7 @@ Ultra-HD export/share system
 
 ## 🔮 Future Roadmap
 
-* Real daily.dev API integration
+* Official daily.dev Public API migration
 * GitHub repository analysis
 * Stack intelligence engine
 * Dynamic aura scoring system
