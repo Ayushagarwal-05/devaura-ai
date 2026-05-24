@@ -13,7 +13,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     // ── Fetch developer profile ─────────────────────────────
     const profileRes = await fetch(
-      `http://localhost:3000/api/profile?username=${encodeURIComponent(username)}`
+      `${new URL(request.url).origin}/api/profile?username=${encodeURIComponent(username)}`
     );
 
     if (!profileRes.ok) {
