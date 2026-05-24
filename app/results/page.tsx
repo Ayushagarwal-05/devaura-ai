@@ -503,7 +503,7 @@ export default function ResultsPage() {
 
   Aura Score: ${score}
 
-  Analyze yours → https://devaura-ai.vercel.app`
+  Analyze yours → https://devaura-ai-2mx4.vercel.app/`
     );
 
     alert("DevAura identity copied.");
